@@ -21,6 +21,6 @@ func (repo *NocRepositoryLocal) StoreNocRecord(record ach_power_tools.NocRecord)
 	return nil
 }
 
-func (repo NocRepositoryLocal) GetNocRecords() []ach_power_tools.NocRecord {
+func (repo *NocRepositoryLocal) GetNocRecords() []ach_power_tools.NocRecord {
 	return repo.noc_records
 }

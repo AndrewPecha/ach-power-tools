@@ -1,1 +1,4 @@
 /.idea
+ui/.idea
+ui/*/.angular
+ui/*/node_modules

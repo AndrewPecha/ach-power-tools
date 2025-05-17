@@ -1,0 +1,24 @@
+<button (click)="refreshData()" value="asdasdasd">
+Click to refresh
+</button>
+
+<div class="grid-container">
+  <table>
+    <thead>
+    <tr>
+      <th>C Code</th>
+      <th>Corrected Value</th>
+      <th>Incorrect Value</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let item of gridData">
+      <td>{{ item.CCode }}</td>
+      <td>{{ item.CorrectedValue }}</td>
+      <td>{{ item.IncorrectValue }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<router-outlet />
