@@ -200,7 +200,7 @@ func correctEntriesFromNocStore(achFile ach.File) ach.File {
 		for _, entry := range batch.GetEntries() {
 			nocRecords := repo.GetNocRecords()
 			for _, record := range nocRecords {
-				if record.IncorrectValue == entry.DFIAccountNumber {
+				if record.CCode == "C01" && record.IncorrectValue == entry.DFIAccountNumber {
 					entry.DFIAccountNumber = record.CorrectedValue
 				}
 			}
