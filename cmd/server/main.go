@@ -121,8 +121,13 @@ func storeNocEntries(w http.ResponseWriter, r *http.Request) {
 	for _, batch := range achFile.Batches {
 		for _, entry := range batch.GetEntries() {
 			if entry.Addenda98 != nil { // Addenda98 contains details on NOC entries
+				var incorrectValue string = "missing"
+				if entry.Addenda98.ChangeCode == "C01" {
+					incorrectValue = entry.DFIAccountNumber
+				}
+
 				repo.StoreNocRecord(ach_power_tools.NocRecord{
-					IncorrectValue: "TODO",
+					IncorrectValue: incorrectValue,
 					CorrectedValue: entry.Addenda98.CorrectedData,
 					CCode:          entry.Addenda98.ChangeCode,
 				})
