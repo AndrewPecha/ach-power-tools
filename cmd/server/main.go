@@ -166,6 +166,56 @@ func retrieveNocEntries(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func correctFileFromNocStore(w http.ResponseWriter, r *http.Request) {
+	// Ensure the request method is POST
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Read the file content from the request body
+	defer r.Body.Close()
+	err, achFile := parseAchFileFromRequest(w, r)
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse ACH file: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	correctedFile := correctEntriesFromNocStore(achFile)
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Disposition", `attachment; filename="corrected-ach-file.ach"`)
+	w.WriteHeader(http.StatusOK)
+
+	_, err = w.Write([]byte(achpt.GetAchFileString(&correctedFile)))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func correctEntriesFromNocStore(achFile ach.File) ach.File {
+	for _, batch := range achFile.Batches {
+		for _, entry := range batch.GetEntries() {
+			nocRecords := repo.GetNocRecords()
+			for _, record := range nocRecords {
+				if record.IncorrectValue == entry.DFIAccountNumber {
+					entry.DFIAccountNumber = record.CorrectedValue
+				}
+			}
+		}
+
+		err := achFile.Validate()
+		if err != nil {
+			return ach.File{}
+		}
+
+	}
+
+	return achFile
+}
+
 func main() {
 	http.HandleFunc("/sample-ach", achHandler)
 	http.HandleFunc("/sample-ach-json", achAsJsonHandler)
@@ -173,6 +223,7 @@ func main() {
 	http.HandleFunc("/ach-to-json", achStringToJsonHandler)
 	http.HandleFunc("/store-noc-entries", storeNocEntries)
 	http.HandleFunc("/get-noc-entries", retrieveNocEntries)
+	http.HandleFunc("/correct-file-from-noc-store", correctFileFromNocStore)
 	fmt.Println("Server started on port 8080")
 	http.ListenAndServe(":8080", nil)
 }

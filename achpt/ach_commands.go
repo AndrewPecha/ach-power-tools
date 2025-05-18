@@ -79,6 +79,10 @@ func CreateSampleAch() string {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
+	return GetAchFileString(file)
+}
+
+func GetAchFileString(file *ach.File) string {
 	var sb = new(strings.Builder)
 	var writer = ach.NewWriter(sb)
 
