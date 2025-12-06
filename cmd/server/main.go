@@ -6,10 +6,11 @@ import (
 	"ach-power-tools/infrastructure"
 	"encoding/json"
 	"fmt"
-	"github.com/moov-io/ach"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/moov-io/ach"
 )
 
 var repo = infrastructure.NewNocRepositoryLocal()
@@ -216,9 +217,24 @@ func correctEntriesFromNocStore(achFile ach.File) ach.File {
 	return achFile
 }
 
+func withCORS(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		handler(w, r)
+	}
+}
+
 func main() {
 	http.HandleFunc("/sample-ach", achHandler)
-	http.HandleFunc("/sample-ach-json", achAsJsonHandler)
+	http.HandleFunc("/sample-ach-json", withCORS(achAsJsonHandler))
 	http.HandleFunc("/download-sample-ach", achSampleFileDownloadHandler)
 	http.HandleFunc("/ach-to-json", achStringToJsonHandler)
 	http.HandleFunc("/store-noc-entries", storeNocEntries)
@@ -226,4 +242,5 @@ func main() {
 	http.HandleFunc("/correct-file-from-noc-store", correctFileFromNocStore)
 	fmt.Println("Server started on port 8080")
 	http.ListenAndServe(":8080", nil)
+
 }
