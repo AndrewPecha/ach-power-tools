@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import AchViewer from "./pages/AchViewer";
+import AchBuilder from "./pages/AchBuilder.tsx";
 
 function Home() {
   const [count, setCount] = useState(0)
@@ -40,6 +41,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/ach-viewer" element={<AchViewer/>}/>
+                <Route path="/ach-builder" element={<AchBuilder/>}/>
 
                 {/* Add more routes here as you create new pages */}
             </Routes>
