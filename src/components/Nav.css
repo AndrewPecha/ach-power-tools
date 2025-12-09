@@ -1,0 +1,28 @@
+.nav {
+    background-color: #002dfd;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    /* Empty for now, can add item-specific styles if needed */
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: #61dafb;
+}
