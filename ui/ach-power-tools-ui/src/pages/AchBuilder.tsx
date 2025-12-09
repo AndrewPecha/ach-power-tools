@@ -37,7 +37,65 @@ function AchBuilder() {
                 </Collapsible>
             )}
             <Collapsible title="Batches">
-                <p>Batches go here!</p>
+                <div>
+                    <button
+                        onClick={() => {
+                            if (achFile) {
+                                setAchFile({
+                                    ...achFile,
+                                    batches: [
+                                        ...achFile.batches,
+                                        {
+                                            batchHeader: {
+                                                serviceClassCode: 200,
+                                                companyName: "New Companys",
+                                                companyDiscretionaryData: "",
+                                                companyIdentification: "",
+                                                standardEntryClassCode: "PPD",
+                                                companyEntryDescription: "",
+                                                companyDescriptiveDate: "",
+                                                effectiveEntryDate: "",
+                                                settlementDate: "",
+                                                originatorStatusCode: 1,
+                                                ODFIIdentification: "",
+                                                batchNumber: achFile.batches.length + 1
+                                            },
+                                            entryDetails: [],
+                                            batchControl: {
+                                                serviceClassCode: 200,
+                                                entryAddendaCount: 0,
+                                                entryHash: 0,
+                                                totalDebit: 0,
+                                                totalCredit: 0,
+                                                companyIdentification: "",
+                                                ODFIIdentification: "",
+                                                batchNumber: achFile.batches.length + 1
+                                            }
+                                        }
+                                    ]
+                                });
+                            }
+                        }}
+                        style={{
+                            padding: '8px 16px',
+                            backgroundColor: '#4CAF50',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            marginBottom: '10px'
+                        }}
+                    >
+                        Add Batch
+                    </button>
+                    {achFile?.batches.map((batch, index) => (
+                        <Collapsible key={index} title={`Batch ${batch.batchHeader.batchNumber}`}>
+                            <p>Service Class Code: {batch.batchHeader.serviceClassCode}</p>
+                            <p>Company Name: {batch.batchHeader.companyName}</p>
+                            <p>SEC Code: {batch.batchHeader.standardEntryClassCode}</p>
+                        </Collapsible>
+                    ))}
+                </div>
             </Collapsible>
             <Collapsible title="File Control">
                 <p>File Control goes here!</p>
