@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.6",
     "@rollup/rollup-win32-x64-msvc": "^4.53.3",
     "ach-node-sdk": "^1.12.0",
     "react": "^19.2.0",

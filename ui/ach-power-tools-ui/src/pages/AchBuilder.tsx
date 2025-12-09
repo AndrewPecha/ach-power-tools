@@ -14,12 +14,53 @@ function AchBuilder() {
         }
 
         const data = await response.json();
-        setAchFile(data);
+        const data_with_batches_removed = {...data, batches: []}
+        setAchFile(data_with_batches_removed);
     };
 
     useEffect(() => {
         fetchAch().catch(error => console.error(error));
     }, [])
+
+    const addBatchToFile = () => {
+        if (!achFile) {
+            return;
+        }
+
+        return {
+            ...achFile,
+            batches: [
+                ...achFile.batches,
+                {
+                    batchHeader: {
+                        serviceClassCode: 200,
+                        companyName: "New Company",
+                        companyDiscretionaryData: "",
+                        companyIdentification: "",
+                        standardEntryClassCode: "PPD",
+                        companyEntryDescription: "",
+                        companyDescriptiveDate: "",
+                        effectiveEntryDate: "",
+                        settlementDate: "",
+                        originatorStatusCode: 1,
+                        ODFIIdentification: "",
+                        batchNumber: achFile.batches.length + 1
+                    },
+                    entryDetails: [],
+                    batchControl: {
+                        serviceClassCode: 200,
+                        entryAddendaCount: 0,
+                        entryHash: 0,
+                        totalDebit: 0,
+                        totalCredit: 0,
+                        companyIdentification: "",
+                        ODFIIdentification: "",
+                        batchNumber: achFile.batches.length + 1
+                    }
+                }
+            ]
+        }
+    }
 
     return (
         <>
@@ -38,61 +79,82 @@ function AchBuilder() {
             )}
             <Collapsible title="Batches">
                 <div>
-                    <button
+                    <button className="add-button"
                         onClick={() => {
                             if (achFile) {
-                                setAchFile({
-                                    ...achFile,
-                                    batches: [
-                                        ...achFile.batches,
-                                        {
-                                            batchHeader: {
-                                                serviceClassCode: 200,
-                                                companyName: "New Companys",
-                                                companyDiscretionaryData: "",
-                                                companyIdentification: "",
-                                                standardEntryClassCode: "PPD",
-                                                companyEntryDescription: "",
-                                                companyDescriptiveDate: "",
-                                                effectiveEntryDate: "",
-                                                settlementDate: "",
-                                                originatorStatusCode: 1,
-                                                ODFIIdentification: "",
-                                                batchNumber: achFile.batches.length + 1
-                                            },
-                                            entryDetails: [],
-                                            batchControl: {
-                                                serviceClassCode: 200,
-                                                entryAddendaCount: 0,
-                                                entryHash: 0,
-                                                totalDebit: 0,
-                                                totalCredit: 0,
-                                                companyIdentification: "",
-                                                ODFIIdentification: "",
-                                                batchNumber: achFile.batches.length + 1
-                                            }
-                                        }
-                                    ]
-                                });
+                                setAchFile(addBatchToFile());
                             }
-                        }}
-                        style={{
-                            padding: '8px 16px',
-                            backgroundColor: '#4CAF50',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            marginBottom: '10px'
                         }}
                     >
                         Add Batch
                     </button>
                     {achFile?.batches.map((batch, index) => (
                         <Collapsible key={index} title={`Batch ${batch.batchHeader.batchNumber}`}>
-                            <p>Service Class Code: {batch.batchHeader.serviceClassCode}</p>
-                            <p>Company Name: {batch.batchHeader.companyName}</p>
-                            <p>SEC Code: {batch.batchHeader.standardEntryClassCode}</p>
+                            <Collapsible title="Batch Header">
+                                <p>Service Class Code: {batch.batchHeader.serviceClassCode}</p>
+                                <p>Company Name: {batch.batchHeader.companyName}</p>
+                                <p>SEC Code: {batch.batchHeader.standardEntryClassCode}</p>
+                                <p>Company Discretionary Data: {batch.batchHeader.companyDiscretionaryData}</p>
+                                <p>Company Identification: {batch.batchHeader.companyIdentification}</p>
+                                <p>Company Entry Description: {batch.batchHeader.companyEntryDescription}</p>
+                                <p>Company Descriptive Date: {batch.batchHeader.companyDescriptiveDate}</p>
+                                <p>Effective Entry Date: {batch.batchHeader.effectiveEntryDate}</p>
+                                <p>Settlement Date: {batch.batchHeader.settlementDate}</p>
+                                <p>Originator Status Code: {batch.batchHeader.originatorStatusCode}</p>
+                                <p>ODFI Identification: {batch.batchHeader.ODFIIdentification}</p>
+                                <p>Batch Number: {batch.batchHeader.batchNumber}</p>
+                            </Collapsible>
+                            <Collapsible title="Entry Details">
+                                <button className="add-button"
+                                    onClick={() => {
+                                        if (achFile) {
+                                            const updatedBatches = [...achFile.batches];
+                                            updatedBatches[index].entryDetails.push({
+                                                transactionCode: 22,
+                                                RDFIIdentification: "",
+                                                checkDigit: "0",
+                                                DFIAccountNumber: "",
+                                                amount: 0,
+                                                identificationNumber: "",
+                                                individualName: "New Entry",
+                                                discretionaryData: "",
+                                                addendaRecordIndicator: 0,
+                                                traceNumber: String(Date.now())
+                                            });
+                                            setAchFile({...achFile, batches: updatedBatches});
+                                        }
+                                    }}
+                                >
+                                    Add Entry
+                                </button>
+                                {batch.entryDetails.map((entry, entryIndex) => (
+                                    <Collapsible key={entryIndex} title={`Entry ${entryIndex + 1}`}>
+                                        <p>Transaction Code: {entry.transactionCode}</p>
+                                        <p>Receiving DFI: {entry.RDFIIdentification}</p>
+                                        <p>Check Digit: {entry.checkDigit}</p>
+                                        <p>DFI Account: {entry.DFIAccountNumber}</p>
+                                        <p>Amount: {entry.amount}</p>
+                                        <p>Identification Number: {entry.identificationNumber}</p>
+                                        <p>Individual Name: {entry.individualName}</p>
+                                        <p>Discretionary Data: {entry.discretionaryData}</p>
+                                        <p>Addenda Indicator: {entry.addendaRecordIndicator}</p>
+                                        <p>Trace Number: {entry.traceNumber}</p>
+                                    </Collapsible>
+                                ))}
+                            </Collapsible>
+                            {batch.batchControl && (
+                                <Collapsible title="Batch Control">
+                                    <p>Service Class Code: {batch.batchControl.serviceClassCode}</p>
+                                    <p>Entry/Addenda Count: {batch.batchControl.entryAddendaCount}</p>
+                                    <p>Entry Hash: {batch.batchControl.entryHash}</p>
+                                    <p>Total Debit: {batch.batchControl.totalDebit}</p>
+                                    <p>Total Credit: {batch.batchControl.totalCredit}</p>
+                                    <p>Company Identification: {batch.batchControl.companyIdentification}</p>
+                                    <p>ODFI Identification: {batch.batchControl.ODFIIdentification}</p>
+                                    <p>Batch Number: {batch.batchControl.batchNumber}</p>
+                                </Collapsible>
+                            )}
+
                         </Collapsible>
                     ))}
                 </div>
@@ -100,9 +162,25 @@ function AchBuilder() {
             <Collapsible title="File Control">
                 <p>File Control goes here!</p>
             </Collapsible>
+
+            <style>
+                {`
+                    .add-button {
+                        padding: 8px 16px;
+                        background-color: #4CAF50;
+                        color: white;
+                        border: none;
+                        borderRadius: 4px;
+                        cursor: pointer;
+                        margin-bottom: 10px;
+                }
+                `}
+            </style>
         </>
 
     )
 }
+
+
 
 export default AchBuilder
